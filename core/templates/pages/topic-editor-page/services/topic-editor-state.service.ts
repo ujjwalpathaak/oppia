@@ -645,12 +645,17 @@ export class TopicEditorStateService {
 
   /**
    * Retrieves the name of the skill that matches the given skill ID.
+   * The skill description will always be present, but to maintain
+   * robustness skill ID will be visible in the case of a failure.
    */
   getSelectedSkillName(
     skillId: string,
     allSkillSummaries: ShortSkillSummary[]
-  ): string | undefined {
-    return allSkillSummaries?.find(skill => skill.id === skillId)?.description;
+  ): string {
+    return (
+      allSkillSummaries?.find(skill => skill.id === skillId)?.description ||
+      skillId
+    );
   }
 
   /**
