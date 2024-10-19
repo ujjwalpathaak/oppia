@@ -48,6 +48,7 @@ import {
 } from 'domain/editor/undo_redo/change.model';
 import {LoaderService} from 'services/loader.service';
 import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
 interface GroupedSkillSummaryDict {
   current: SkillSummaryBackendDict[];
@@ -87,6 +88,7 @@ export class TopicEditorStateService {
   private _classroomUrlFragment: string | null = null;
   private _curriculumAdminUsernames: string[] = [];
   private _classroomName: string | null = null;
+  private _skillEditorOpened: boolean = false;
   private _storySummariesInitializedEventEmitter: EventEmitter<void> =
     new EventEmitter();
 
@@ -98,6 +100,9 @@ export class TopicEditorStateService {
 
   private _topicReinitializedEventEmitter: EventEmitter<void> =
     new EventEmitter();
+
+  private _skillEditorOpenedEventEmitter: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   constructor(
     private alertsService: AlertsService,
@@ -317,6 +322,10 @@ export class TopicEditorStateService {
     );
   }
 
+  isSkillEditorOpened(): boolean {
+    return this._skillEditorOpened;
+  }
+
   getGroupedSkillSummaries(): object {
     return cloneDeep(this._groupedSkillSummaries);
   }
@@ -464,6 +473,11 @@ export class TopicEditorStateService {
     }
   }
 
+  toggleTopicSkillEditor(editorOpened: boolean): void {
+    this._skillEditorOpened = editorOpened;
+    this._skillEditorOpenedEventEmitter.emit(this._skillEditorOpened);
+  }
+
   deleteSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     let index = this._getSubtopicPageIndex(subtopicPageId);
@@ -605,6 +619,10 @@ export class TopicEditorStateService {
     return this._topicReinitializedEventEmitter;
   }
 
+  get onSkillEditorOpened(): EventEmitter<boolean> {
+    return this._skillEditorOpenedEventEmitter;
+  }
+
   /**
    * Returns the classroom url fragment if the topic is assigned to any
    * classroom, else null.
@@ -623,6 +641,16 @@ export class TopicEditorStateService {
 
   getCurriculumAdminUsernames(): string[] {
     return this._curriculumAdminUsernames;
+  }
+
+  /**
+   * Retrieves the name of the skill that matches the given skill ID.
+   */
+  getSelectedSkillName(
+    skillId: string,
+    allSkillSummaries: ShortSkillSummary[]
+  ): string | undefined {
+    return allSkillSummaries?.find(skill => skill.id === skillId)?.description;
   }
 
   /**
