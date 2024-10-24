@@ -700,6 +700,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           }
         );
     } else {
+      this.topicEditorStateService.toggleQuestionEditor(false);
       this.contextService.resetImageSaveDestination();
       this.saveAndPublishQuestion(null);
       this.skillEditorRoutingService.creatingNewQuestion(false);
